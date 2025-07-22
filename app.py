@@ -1,10 +1,20 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask_cors import CORS,cross_origin
 import pickle
 import logging
 
 app = Flask(__name__)
-CORS(app)
+
+
+# CORS para *todas* las rutas, permitiendo cualquier origen
+CORS(
+    app,
+    resources={r"/*": {"origins": "*"}},
+    supports_credentials=False,            # no usas cookies
+    allow_headers=["Content-Type", "*"],   # deja pasar JSON etc.
+    methods=["GET", "POST", "OPTIONS"]
+)
+
 
 # Configuración de logs
 logging.basicConfig(level=logging.INFO)
@@ -33,7 +43,8 @@ def home():
     </html>
     """
 
-@app.route('/recomendar', methods=['POST'])
+@app.route('/recomendar', methods=['POST', 'OPTIONS'])
+@cross_origin()
 def recomendar():
     try:
         data = request.get_json(force=True)
